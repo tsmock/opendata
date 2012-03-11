@@ -27,7 +27,7 @@ public interface ParisConstants extends OdConstants {
     /**
      * Portal
      */
-    public static final String PORTAL = "http://opendata.paris.fr/opendata/jsp/site/Portal.jsp?";
+    public static final String PORTAL = "http://opendata.paris.fr/opendata/";
 
     /**
      * Icons

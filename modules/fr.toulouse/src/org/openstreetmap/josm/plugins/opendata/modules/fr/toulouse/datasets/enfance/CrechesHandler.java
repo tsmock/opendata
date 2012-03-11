@@ -24,6 +24,7 @@ public class CrechesHandler extends ToulouseDataSetHandler {
     public CrechesHandler() {
         super(12462, "amenity=kindergarten");
         setWikiPage("Crèches");
+        setCategory(CAT_ENFANCE);
     }
 
     @Override
