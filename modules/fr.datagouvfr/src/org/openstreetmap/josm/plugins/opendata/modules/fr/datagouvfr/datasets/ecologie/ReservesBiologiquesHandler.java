@@ -13,39 +13,26 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package org.openstreetmap.josm.plugins.opendata.modules.fr.datagouvfr.datasets.culture;
-
-import java.nio.charset.Charset;
+package org.openstreetmap.josm.plugins.opendata.modules.fr.datagouvfr.datasets.ecologie;
 
 import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.opendata.modules.fr.datagouvfr.datasets.DataGouvDataSetHandler;
 
-public class BibliothequesHandler extends DataGouvDataSetHandler {
+public class ReservesBiologiquesHandler extends DataGouvDataSetHandler {
 
-	public BibliothequesHandler() {
-		super("Adresses-des-bibliothèques-municipales-30382179", lambert93);
-		setName("Bibliothèques municipales");
-		setDownloadFileName("lieux de lecture_geoloc.txt");
+	public ReservesBiologiquesHandler() {
+		super("Réserves-biologiques-de-métropole-30378855");
+		setName("Réserves biologiques de métropole");
+		setDownloadFileName("ONF_RB_2011_Officielles_L93.zip");
 	}
-
+	
 	@Override
 	public boolean acceptsFilename(String filename) {
-		return acceptsCsvFilename(filename, "lieux de lecture_geoloc.txt-fr");
+		return acceptsZipFilename(filename, "ONF_RB_20.._Officielles_L93") || acceptsShpFilename(filename, "ONF_RB_20.._Officielles_L93");
 	}
 
 	@Override
 	public void updateDataSet(DataSet ds) {
-		for (Node n : ds.getNodes()) {
-			n.put("amenity", "library");
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.openstreetmap.josm.plugins.opendata.core.datasets.AbstractDataSetHandler#getCsvCharset()
-	 */
-	@Override
-	public Charset getCsvCharset() {
-		return Charset.forName(ISO8859_15);
+		// TODO
 	}
 }

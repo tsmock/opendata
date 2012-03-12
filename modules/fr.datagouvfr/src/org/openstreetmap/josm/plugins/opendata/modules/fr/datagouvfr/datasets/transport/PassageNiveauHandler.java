@@ -26,7 +26,7 @@ public class PassageNiveauHandler extends DataGouvDataSetHandler {
 	public PassageNiveauHandler() {
 		super("Passages-à-niveau-30383135");
 		setName("Passages à niveau");
-		setDataGouvFrUrl("passage_a_niveau.csv");
+		setDownloadFileName("passage_a_niveau.csv");
 	}
 
 	@Override
