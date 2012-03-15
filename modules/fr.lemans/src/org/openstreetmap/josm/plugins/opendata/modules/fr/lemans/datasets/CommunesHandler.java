@@ -16,25 +16,33 @@
 package org.openstreetmap.josm.plugins.opendata.modules.fr.lemans.datasets;
 
 import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
 
-public class ServicesCommunautairesMunicipauxHandler extends LeMansDataSetHandler {
+public class CommunesHandler extends LeMansDataSetHandler {
 
-    public ServicesCommunautairesMunicipauxHandler() {
-        super("F7F65F15-550EA533-37695DD8-F7A74F05");
-        setName("Services communautaires et municipaux");
-        setKmzShpUuid("66C925DA-550EA533-7E7BB44A-BCF0B629", "66C972AD-550EA533-7E7BB44A-E842FFAD");
+    public CommunesHandler() {
+        super("F7B756B1-550EA533-37695DD8-FE094AE7");
+        setName("Communes");
+        setKmzShpUuid("64527774-550EA533-7E7BB44A-FD17EEF0", "6452D942-550EA533-7E7BB44A-C184920B");
     }
 
     @Override
     public boolean acceptsFilename(String filename) {
-        return acceptsKmzShpFilename(filename, "SERVICES_VDM_LMM") || acceptsZipFilename(filename, "Les services de le Mans Métropole et de la Ville du Mans .*");
+        return acceptsKmzShpFilename(filename, "LIMITES_DE_COMMUNES") || acceptsZipFilename(filename, "Les limites de communes .*");
     }
 
     @Override
     public void updateDataSet(DataSet ds) {
-        for (Node n : ds.getNodes()) {
-            replace(n, "NOM", "name");
+        for (OsmPrimitive p : ds.allPrimitives()) {
+            if (p.hasKey("CODCOM")) {
+                p.put("type", "boundary");
+                p.put("boundary", "administrative");
+                p.put("admin_level", "8");
+                replace(p, "COMMUNE", "name");
+                p.remove("COMMUNE_2");
+                replace(p, "ID", "ref:INSEE");
+                p.remove("CODCOM");
+            }
         }
     }
 }
