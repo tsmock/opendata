@@ -15,21 +15,21 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package org.openstreetmap.josm.plugins.opendata.core.io.geographic;
 
-public class ShpMathTransformException extends Exception {
+public class GeoCrsException extends Exception {
 
-	public ShpMathTransformException() {
+	public GeoCrsException() {
 		super();
 	}
 
-	public ShpMathTransformException(String message, Throwable cause) {
+	public GeoCrsException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ShpMathTransformException(String message) {
+	public GeoCrsException(String message) {
 		super(message);
 	}
 
-	public ShpMathTransformException(Throwable cause) {
+	public GeoCrsException(Throwable cause) {
 		super(cause);
 	}
 }
