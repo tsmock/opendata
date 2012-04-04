@@ -15,17 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package org.openstreetmap.josm.plugins.opendata.core.io.geographic;
 
-import java.nio.charset.Charset;
-import java.util.Set;
+public interface GmlHandler extends GeographicHandler {
 
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
-
-public interface ShpHandler extends GeographicHandler {
-
-    public void notifyFeatureParsed(Object feature, DataSet result, Set<OsmPrimitive> featurePrimitives);
-
-    public void setDbfCharset(Charset charset);
-    
-    public Charset getDbfCharset();
 }

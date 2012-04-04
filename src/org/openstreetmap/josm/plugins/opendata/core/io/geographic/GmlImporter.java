@@ -15,21 +15,26 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package org.openstreetmap.josm.plugins.opendata.core.io.geographic;
 
-public class ShpCrsException extends Exception {
+import java.io.InputStream;
 
-    public ShpCrsException() {
-        super();
+import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.gui.progress.ProgressMonitor;
+import org.openstreetmap.josm.io.IllegalDataException;
+import org.openstreetmap.josm.plugins.opendata.core.io.AbstractImporter;
+
+public class GmlImporter extends AbstractImporter {
+    
+    public GmlImporter() {
+        super(GML_FILE_FILTER);
     }
 
-    public ShpCrsException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ShpCrsException(String message) {
-        super(message);
-    }
-
-    public ShpCrsException(Throwable cause) {
-        super(cause);
+    @Override
+    protected DataSet parseDataSet(InputStream in, ProgressMonitor instance)
+            throws IllegalDataException {
+        try {
+            return GmlReader.parseDataSet(in, handler, instance);
+        } catch (Exception e) {
+            throw new IllegalDataException(e);
+        }
     }
 }
