@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package org.openstreetmap.josm.plugins.opendata.modules.fr.toulouse.datasets.associations;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.opendata.modules.fr.toulouse.datasets.ToulouseDataSetHandler;
@@ -22,7 +23,7 @@ import org.openstreetmap.josm.plugins.opendata.modules.fr.toulouse.datasets.Toul
 public class Club3eAgeHandler extends ToulouseDataSetHandler {
 
     public Club3eAgeHandler() {
-        super(12587, "leisure=club", "club=elderly");
+        super(12587, "social_facility=outreach", "social_facility:for=senior");
         setWikiPage("Clubs du 3ème âge");
         setCategory(CAT_ASSOCIATIONS);
     }
@@ -36,8 +37,17 @@ public class Club3eAgeHandler extends ToulouseDataSetHandler {
     public void updateDataSet(DataSet ds) {
         for (Node n : ds.getNodes()) {
             replace(n, "Nom", "name");
-            n.put("leisure", "club");
-            n.put("club", "elderly");
+            n.put("name", WordUtils.capitalizeFully(n.get("name")));
+            n.put("social_facility", "outreach");
+            n.put("social_facility:for", "senior");
+            n.remove("Adresse");
+            n.remove("CP");
+            n.remove("Classe");
+            n.remove("CodSTI");
+            n.remove("Description");
+            n.remove("Numero");
+            n.remove("Ville");
+            n.remove("color");
         }
     }
 }
