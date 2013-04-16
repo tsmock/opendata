@@ -59,6 +59,7 @@ public abstract class AbstractMapInfoReader extends AbstractReader implements Od
         return dataFile;
     }
     
+    @SuppressWarnings("resource")
     protected final BufferedReader getDataReader(File headerFile, String extension, Charset charset) throws FileNotFoundException {
         File dataFile = getDataFile(headerFile, extension);
         return dataFile.exists() ? new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), charset)) : null;
