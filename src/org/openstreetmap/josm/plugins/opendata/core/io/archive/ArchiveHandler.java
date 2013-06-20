@@ -1,5 +1,5 @@
 //    JOSM opendata plugin.
-//    Copyright (C) 2011-2012 Don-vip
+//    Copyright (C) 2011-2013 Don-vip
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ package org.openstreetmap.josm.plugins.opendata.core.io.archive;
 
 import java.io.File;
 
-public interface ZipHandler {
+public interface ArchiveHandler {
 
 	public void notifyTempFileWritten(File file);
 
