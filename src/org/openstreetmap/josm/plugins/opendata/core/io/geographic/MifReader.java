@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -24,13 +26,15 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.projection.Projection;
 import org.openstreetmap.josm.data.projection.Projections;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
+import org.openstreetmap.josm.plugins.opendata.core.OdConstants;
 import org.openstreetmap.josm.plugins.opendata.core.datasets.AbstractDataSetHandler;
 import org.openstreetmap.josm.plugins.opendata.core.util.OdUtils;
 
 /**
- * MapInfo Interchange File (MIF) reader, based on this specification:
- * http://www.gissky.com/Download/Download/DataFormat/Mapinfo_Mif.pdf
- *
+ * MapInfo Interchange File (MIF) reader, based on these specifications:<ul>
+ * <li><a href="http://www.gissky.com/Download/Download/DataFormat/Mapinfo_Mif.pdf">Mapinfo_Mif.pdf (dead link)</a></li>
+ * <li><a href="http://resource.mapinfo.com/static/files/document/1074660800077/interchange_file.pdf">interchange_file.pdf</a></li>
+ * </ul>
  */
 public class MifReader extends AbstractMapInfoReader {
 
@@ -70,6 +74,10 @@ public class MifReader extends AbstractMapInfoReader {
     private Double falseEasting;
     private Double falseNorthing;
     private Double range;
+    private Double minx;
+    private Double miny;
+    private Double maxx;
+    private Double maxy;
     
     // Region clause
     private int numpolygons = -1;
@@ -77,7 +85,7 @@ public class MifReader extends AbstractMapInfoReader {
     
     public static DataSet parseDataSet(InputStream in, File file,
             AbstractDataSetHandler handler, ProgressMonitor instance) throws IOException {
-        return new MifReader().parse(in, file, instance, Charset.forName(ISO8859_15));
+        return new MifReader().parse(in, file, instance, Charset.forName(OdConstants.ISO8859_15));
     }
 
     private void parseDelimiter(String[] words) {
@@ -86,176 +94,214 @@ public class MifReader extends AbstractMapInfoReader {
 
     private void parseUnique(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Unique: "+line);
     }
 
     private void parseIndex(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Index: "+line);
+    }
+
+    private void parseCoordSysSyntax1(String[] words) {
+        proj = MifProjection.forCode(Integer.parseInt(words[3]));
+        datum = MifDatum.forCode(Integer.parseInt(words[4]));
+
+        // Custom datum: TODO: use custom decalage values
+        int offset = datum == Custom ? 4 : 0;
+
+        if (proj == Longitude_Latitude) {
+            josmProj = Projections.getProjectionByCode("EPSG:4326"); // WGS 84
+            return;
+        }
+        
+        // Units
+        units = words[5+offset];
+        
+        // Origin, longitude
+        originLon = Double.parseDouble(words[6+offset]);
+        
+        // Origin, latitude
+        switch(proj) {
+        case Albers_Equal_Area_Conic:
+        case Azimuthal_Equidistant_polar_aspect_only:
+        case Equidistant_Conic_also_known_as_Simple_Conic:
+        case Hotine_Oblique_Mercator:
+        case Lambert_Azimuthal_Equal_Area_polar_aspect_only:
+        case Lambert_Conformal_Conic:
+        case Lambert_Conformal_Conic_modified_for_Belgium_1972:
+        case New_Zealand_Map_Grid:
+        case Stereographic:
+        case Swiss_Oblique_Mercator:
+        case Transverse_Mercator_also_known_as_Gauss_Kruger:
+        case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
+        case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
+        case Transverse_Mercator_modified_for_Finnish_KKJ:
+        case Transverse_Mercator_modified_for_Sjaelland:
+        case Polyconic:
+            originLat = Double.parseDouble(words[7+offset]);
+            break;
+        }
+        
+        // Standard Parallel 1
+        switch (proj) {
+        case Cylindrical_Equal_Area:
+        case Regional_Mercator:
+            stdP1 = Double.parseDouble(words[7+offset]);
+            break;
+        case Albers_Equal_Area_Conic:
+        case Equidistant_Conic_also_known_as_Simple_Conic:
+        case Lambert_Conformal_Conic:
+        case Lambert_Conformal_Conic_modified_for_Belgium_1972:
+            stdP1 = Double.parseDouble(words[8+offset]);
+            break;
+        }
+
+        // Standard Parallel 2
+        switch (proj) {
+        case Albers_Equal_Area_Conic:
+        case Equidistant_Conic_also_known_as_Simple_Conic:
+        case Lambert_Conformal_Conic:
+        case Lambert_Conformal_Conic_modified_for_Belgium_1972:
+            stdP2 = Double.parseDouble(words[9+offset]);
+            break;
+        }
+        
+        // Azimuth
+        if (proj == Hotine_Oblique_Mercator) {
+            azimuth = Double.parseDouble(words[8+offset]);
+        }
+
+        // Scale Factor
+        switch (proj) {
+        case Hotine_Oblique_Mercator:
+            scaleFactor = Double.parseDouble(words[9+offset]);
+            break;
+        case Stereographic:
+        case Transverse_Mercator_also_known_as_Gauss_Kruger:
+        case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
+        case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
+        case Transverse_Mercator_modified_for_Finnish_KKJ:
+        case Transverse_Mercator_modified_for_Sjaelland:
+            scaleFactor = Double.parseDouble(words[8+offset]);
+            break;
+        }
+        
+        // False Easting/Northing
+        switch (proj) {
+        case Albers_Equal_Area_Conic:
+        case Equidistant_Conic_also_known_as_Simple_Conic:
+        case Hotine_Oblique_Mercator:
+        case Lambert_Conformal_Conic:
+        case Lambert_Conformal_Conic_modified_for_Belgium_1972:
+            falseEasting = Double.parseDouble(words[10+offset]);
+            falseNorthing = Double.parseDouble(words[11+offset]);
+            break;
+        case Stereographic:
+        case Transverse_Mercator_also_known_as_Gauss_Kruger:
+        case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
+        case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
+        case Transverse_Mercator_modified_for_Finnish_KKJ:
+        case Transverse_Mercator_modified_for_Sjaelland:
+            falseEasting = Double.parseDouble(words[9+offset]);
+            falseNorthing = Double.parseDouble(words[10+offset]);
+            break;
+        case New_Zealand_Map_Grid:
+        case Swiss_Oblique_Mercator:
+        case Polyconic:
+            falseEasting = Double.parseDouble(words[8+offset]);
+            falseNorthing = Double.parseDouble(words[9+offset]);
+            break;
+        }
+                                    
+        // Range
+        switch (proj) {
+        case Azimuthal_Equidistant_polar_aspect_only:
+        case Lambert_Azimuthal_Equal_Area_polar_aspect_only:
+            range = Double.parseDouble(words[8+offset]);
+        }
+
+        switch (proj) {
+        case Lambert_Conformal_Conic:
+            if ((datum == Geodetic_Reference_System_1980_GRS_80 || datum == Custom) && equals(originLon, 3.0)) {
+                // This sounds good for Lambert 93 or Lambert CC 9
+                if (equals(originLat, 46.5) && equals(stdP1, 44.0) && equals(stdP2, 49.0) && equals(falseEasting, 700000.0) && equals(falseNorthing, 6600000.0)) {
+                    josmProj = Projections.getProjectionByCode("EPSG:2154"); // Lambert 93
+                } else if (equals(falseEasting, 1700000.0)) {
+                    for (int i=0; josmProj == null && i<9; i++) {
+                        if (equals(originLat, 42.0+i) && equals(stdP1, 41.25+i) && equals(stdP2, 42.75+i) && equals(falseNorthing, (i+1)*1000000.0 + 200000.0)) {
+                            josmProj = Projections.getProjectionByCode("EPSG:"+Integer.toString(3942 + i)); // LambertCC9Zones
+                        }
+                    }
+                }
+            }
+            break;
+        default:
+            // TODO
+            Main.warn("TODO proj: "+line);
+        }
+        
+        // TODO: handle cases with Affine declaration
+        int index = parseAffineUnits(words);
+
+        // handle cases with Bounds declaration
+        parseBounds(words, index);
+    }
+
+    private void parseCoordSysSyntax2(String[] words) {
+        // handle cases with Affine declaration
+        int index = parseAffineUnits(words);
+        
+        // FIXME: no idea what projection has to be used for real with "non-earth" mode...
+        josmProj = Projections.getProjectionByCode("EPSG:4326"); // WGS 84
+        
+        units = words[index+1];
+        
+        parseBounds(words, index+2);
+    }
+    
+    private int parseAffineUnits(String[] words) {
+        // TODO: handle affine units
+        return 2+0;
+    }
+
+    private void parseBounds(String[] words, int index) {
+        if (index < words.length && "Bounds".equals(words[index])) {
+            // Useless parenthesis... "(minx, miny) (maxx, maxy)"
+            minx = Double.parseDouble(words[index+1].substring(1));
+            miny = Double.parseDouble(words[index+2].substring(0, words[index+2].length()-1));
+            maxx = Double.parseDouble(words[index+3].substring(1));
+            maxy = Double.parseDouble(words[index+4].substring(0, words[index+4].length()-1));
+            if (Main.isTraceEnabled()) {
+                Main.trace(Arrays.toString(words) + " -> "+minx+","+miny+","+maxx+","+maxy);
+            }
+        }
     }
 
     private void parseCoordSys(String[] words) {
         for (int i = 0; i<words.length; i++) {
             words[i] = words[i].replace(",", "");
         }
-        if (words[1].equalsIgnoreCase("Earth")) {
-            proj = MifProjection.forCode(Integer.parseInt(words[3]));
-            datum = MifDatum.forCode(Integer.parseInt(words[4]));
-
-            // Custom datum: TODO: use custom decalage values
-            int offset = datum == Custom ? 4 : 0;
-
-            if (proj == Longitude_Latitude) {
-                josmProj = Projections.getProjectionByCode("EPSG:4326"); // WGS 84
-                return;
-            }
-            
-            // Units
-            units = words[5+offset];
-            
-            // Origin, longitude
-            originLon = Double.parseDouble(words[6+offset]);
-            
-            // Origin, latitude
-            switch(proj) {
-            case Albers_Equal_Area_Conic:
-            case Azimuthal_Equidistant_polar_aspect_only:
-            case Equidistant_Conic_also_known_as_Simple_Conic:
-            case Hotine_Oblique_Mercator:
-            case Lambert_Azimuthal_Equal_Area_polar_aspect_only:
-            case Lambert_Conformal_Conic:
-            case Lambert_Conformal_Conic_modified_for_Belgium_1972:
-            case New_Zealand_Map_Grid:
-            case Stereographic:
-            case Swiss_Oblique_Mercator:
-            case Transverse_Mercator_also_known_as_Gauss_Kruger:
-            case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
-            case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
-            case Transverse_Mercator_modified_for_Finnish_KKJ:
-            case Transverse_Mercator_modified_for_Sjaelland:
-            case Polyconic:
-                originLat = Double.parseDouble(words[7+offset]);
-                break;
-            }
-            
-            // Standard Parallel 1
-            switch (proj) {
-            case Cylindrical_Equal_Area:
-            case Regional_Mercator:
-                stdP1 = Double.parseDouble(words[7+offset]);
-                break;
-            case Albers_Equal_Area_Conic:
-            case Equidistant_Conic_also_known_as_Simple_Conic:
-            case Lambert_Conformal_Conic:
-            case Lambert_Conformal_Conic_modified_for_Belgium_1972:
-                stdP1 = Double.parseDouble(words[8+offset]);
-                break;
-            }
-
-            // Standard Parallel 2
-            switch (proj) {
-            case Albers_Equal_Area_Conic:
-            case Equidistant_Conic_also_known_as_Simple_Conic:
-            case Lambert_Conformal_Conic:
-            case Lambert_Conformal_Conic_modified_for_Belgium_1972:
-                stdP2 = Double.parseDouble(words[9+offset]);
-                break;
-            }
-            
-            // Azimuth
-            if (proj == Hotine_Oblique_Mercator) {
-                azimuth = Double.parseDouble(words[8+offset]);
-            }
-
-            // Scale Factor
-            switch (proj) {
-            case Hotine_Oblique_Mercator:
-                scaleFactor = Double.parseDouble(words[9+offset]);
-                break;
-            case Stereographic:
-            case Transverse_Mercator_also_known_as_Gauss_Kruger:
-            case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
-            case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
-            case Transverse_Mercator_modified_for_Finnish_KKJ:
-            case Transverse_Mercator_modified_for_Sjaelland:
-                scaleFactor = Double.parseDouble(words[8+offset]);
-                break;
-            }
-            
-            // False Easting/Northing
-            switch (proj) {
-            case Albers_Equal_Area_Conic:
-            case Equidistant_Conic_also_known_as_Simple_Conic:
-            case Hotine_Oblique_Mercator:
-            case Lambert_Conformal_Conic:
-            case Lambert_Conformal_Conic_modified_for_Belgium_1972:
-                falseEasting = Double.parseDouble(words[10+offset]);
-                falseNorthing = Double.parseDouble(words[11+offset]);
-                break;
-            case Stereographic:
-            case Transverse_Mercator_also_known_as_Gauss_Kruger:
-            case Transverse_Mercator_modified_for_Danish_System_34_Jylland_Fyn:
-            case Transverse_Mercator_modified_for_Danish_System_45_Bornholm:
-            case Transverse_Mercator_modified_for_Finnish_KKJ:
-            case Transverse_Mercator_modified_for_Sjaelland:
-                falseEasting = Double.parseDouble(words[9+offset]);
-                falseNorthing = Double.parseDouble(words[10+offset]);
-                break;
-            case New_Zealand_Map_Grid:
-            case Swiss_Oblique_Mercator:
-            case Polyconic:
-                falseEasting = Double.parseDouble(words[8+offset]);
-                falseNorthing = Double.parseDouble(words[9+offset]);
-                break;
-            }
-                                        
-            // Range
-            switch (proj) {
-            case Azimuthal_Equidistant_polar_aspect_only:
-            case Lambert_Azimuthal_Equal_Area_polar_aspect_only:
-                range = Double.parseDouble(words[8+offset]);
-            }
-
-            switch (proj) {
-            case Lambert_Conformal_Conic:
-                if ((datum == Geodetic_Reference_System_1980_GRS_80 || datum == Custom) && equals(originLon, 3.0)) {
-                    // This sounds good for Lambert 93 or Lambert CC 9
-                    if (equals(originLat, 46.5) && equals(stdP1, 44.0) && equals(stdP2, 49.0) && equals(falseEasting, 700000.0) && equals(falseNorthing, 6600000.0)) {
-                        josmProj = Projections.getProjectionByCode("EPSG:2154"); // Lambert 93
-                    } else if (equals(falseEasting, 1700000.0)) {
-                        for (int i=0; josmProj == null && i<9; i++) {
-                            if (equals(originLat, 42.0+i) && equals(stdP1, 41.25+i) && equals(stdP2, 42.75+i) && equals(falseNorthing, (i+1)*1000000.0 + 200000.0)) {
-                                josmProj = Projections.getProjectionByCode("EPSG:"+Integer.toString(3942 + i)); // LambertCC9Zones
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                // TODO
-                System.err.println("TODO: "+line);
-            }
-            
-        } else if (words[1].equalsIgnoreCase("Nonearth")) {
-            // TODO
-            System.err.println("TODO: "+line);
-        } else if (words[1].equalsIgnoreCase("Layout")) {
-            // TODO
-            System.err.println("TODO: "+line);
-        } else if (words[1].equalsIgnoreCase("Table")) {
-            // TODO
-            System.err.println("TODO: "+line);
-        } else if (words[1].equalsIgnoreCase("Window")) {
-            // TODO
-            System.err.println("TODO: "+line);
-        } else {
-            System.err.println("Line "+lineNum+". Invalid CoordSys clause: "+line);
+        switch (words[1].toLowerCase()) {
+        case "earth":
+            parseCoordSysSyntax1(words);
+            break;
+        case "nonearth":
+            parseCoordSysSyntax2(words);
+            break;
+        case "layout":
+        case "table":
+        case "window":
+            // TODO: support Layout, Table, Window clauses 
+            Main.warn("TODO: "+line);
+            break;
+        default:
+            Main.warn("Line "+lineNum+". Invalid CoordSys clause: "+line);
         }
     }
 
     private void parseTransform(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Transform: "+line);
     }
 
     @Override
@@ -274,9 +320,12 @@ public class MifReader extends AbstractMapInfoReader {
         readAttributes(createNode(words[1], words[2]));
     }
 
-    private void parseLine(String[] words) {
-        // TODO
-        System.err.println("TODO: "+line);
+    private void parseLine(String[] words) throws IOException {
+        Way line = new Way();
+        ds.addPrimitive(line);
+        readAttributes(line);
+        line.addNode(createNode(words[1], words[2]));
+        line.addNode(createNode(words[3], words[4]));
     }
     
     private void parsePLine(String[] words) throws IOException {
@@ -304,27 +353,27 @@ public class MifReader extends AbstractMapInfoReader {
 
     private void parseArc(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Arc: "+line);
     }
 
     private void parseText(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Text: "+line);
     }
 
     private void parseRect(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Rect: "+line);
     }
 
     private void parseRoundRect(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO RoundRect: "+line);
     }
 
     private void parseEllipse(String[] words) {
         // TODO
-        System.err.println("TODO: "+line);
+        Main.warn("TODO Ellipse: "+line);
     }
 
     private DataSet parse(InputStream in, File file, ProgressMonitor instance, Charset charset) throws IOException {
@@ -427,7 +476,7 @@ public class MifReader extends AbstractMapInfoReader {
             } else if (words[0].equalsIgnoreCase("Font")) {
                 // Do nothing
             } else if (!words[0].isEmpty()) {
-                System.err.println("Line "+lineNum+". Unknown clause in data section: "+line);
+                Main.warn("Line "+lineNum+". Unknown clause in data section: "+line);
             }
         } else if (state == State.READING_COLUMNS && numcolumns > 0) {
             columns.add(words[0]);
@@ -435,7 +484,7 @@ public class MifReader extends AbstractMapInfoReader {
                 state = State.UNKNOWN;
             }
         } else if (!line.isEmpty()) {
-            System.err.println("Line "+lineNum+". Unknown clause in header: "+line);
+            Main.warn("Line "+lineNum+". Unknown clause in header: "+line);
         }
     }
     
@@ -445,7 +494,7 @@ public class MifReader extends AbstractMapInfoReader {
             if (midLine != null) {
                 String[] fields = OdUtils.stripQuotesAndExtraChars(midLine.split(delimiter.toString()), delimiter.toString());
                 if (columns.size() != fields.length) {
-                    System.err.println("Error: Incoherence between MID and MIF files ("+columns.size()+" columns vs "+fields.length+" fields)");
+                    Main.error("Incoherence between MID and MIF files ("+columns.size()+" columns vs "+fields.length+" fields)");
                 }
                 for (int i=0; i<Math.min(columns.size(), fields.length); i++) {
                     String field = fields[i].trim();
