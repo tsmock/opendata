@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -34,6 +35,11 @@ public class ZipReader extends ArchiveReader {
     public static DataSet parseDataSet(InputStream in, AbstractDataSetHandler handler, ProgressMonitor instance, boolean promptUser) 
             throws IOException, XMLStreamException, FactoryConfigurationError, JAXBException {
         return new ZipReader(in, handler, promptUser).parseDoc(instance);
+    }
+
+    public static Map<File, DataSet> parseDataSets(InputStream in, AbstractDataSetHandler handler, ProgressMonitor instance, boolean promptUser) 
+            throws IOException, XMLStreamException, FactoryConfigurationError, JAXBException {
+        return new ZipReader(in, handler, promptUser).parseDocs(instance);
     }
 
     protected void extractArchive(final File temp, final List<File> candidates) throws IOException, FileNotFoundException {
@@ -74,7 +80,8 @@ public class ZipReader extends ArchiveReader {
         }
     }
 
-    @Override protected String getTaskMessage() {
+    @Override
+    protected String getTaskMessage() {
         return tr("Reading Zip file...");
     }
 }
