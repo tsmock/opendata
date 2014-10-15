@@ -387,7 +387,7 @@ public abstract class AbstractDataSetHandler {
     }
 
     protected final ExtendedSourceEntry getMapPaintStyle(String displayName, String fileNameWithoutExtension) {
-        return new ExtendedSourceEntry(displayName,	OdConstants.PROTO_RSRC+//"/"+
+        return new ExtendedSourceEntry(displayName,    OdConstants.PROTO_RSRC+//"/"+
                 this.getClass().getPackage().getName().replace(".", "/")+"/"+
                 fileNameWithoutExtension+"."+OdConstants.MAPCSS_EXT);
     }

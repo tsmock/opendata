@@ -132,10 +132,10 @@ public class OdPreferenceSetting extends DefaultTabPreferenceSetting {
     @Override
     public boolean ok() {
         boolean result = modulePref.ok();
-        //Main.pref.put(PREF_COORDINATES, rbWGS84.isSelected() ? VALUE_WGS84 : VALUE_CC9ZONES);
-        Main.pref.put(OdConstants.PREF_OAPI, oapi.getText());
-        Main.pref.put(OdConstants.PREF_XAPI, xapi.getText());
-        Main.pref.put(OdConstants.PREF_RAWDATA, rawData.isSelected());
+           //Main.pref.put(PREF_COORDINATES, rbWGS84.isSelected() ? VALUE_WGS84 : VALUE_CC9ZONES);
+           Main.pref.put(OdConstants.PREF_OAPI, oapi.getText());
+           Main.pref.put(OdConstants.PREF_XAPI, xapi.getText());
+           Main.pref.put(OdConstants.PREF_RAWDATA, rawData.isSelected());
         
         // create a task for downloading modules if the user has activated, yet not downloaded,
         // new modules

@@ -194,7 +194,7 @@ public abstract class SpreadSheetReader extends AbstractReader {
                             if (handler != null) {
                                 handler.setYCol(i);
                             }
-                        }					        
+                        }                            
                     }
                     if (!coordinate) {
                         if (!fields[i].isEmpty()) {

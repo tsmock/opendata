@@ -142,7 +142,7 @@ public class NetworkReader extends OsmServerReader {
                 readerClass = findReaderByContentType();
             }
             if (readerClass == null) {
-                throw new OsmTransferException("Cannot find appropriate reader !");//TODO handler job ?
+                   throw new OsmTransferException("Cannot find appropriate reader !");//TODO handler job ?
             } else if (findReaderByExtension(url) != null) {
                 filename = url.substring(url.lastIndexOf('/')+1);
             }

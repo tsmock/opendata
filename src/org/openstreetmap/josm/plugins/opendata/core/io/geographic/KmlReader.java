@@ -31,7 +31,7 @@ import org.openstreetmap.josm.plugins.opendata.core.io.ProjectionPatterns;
 public class KmlReader extends AbstractReader {
 
     public static final String KML_PLACEMARK   = "Placemark";
-    public static final String KML_NAME	       = "name";
+    public static final String KML_NAME           = "name";
     public static final String KML_COLOR       = "color";
     public static final String KML_SIMPLE_DATA = "SimpleData";
     public static final String KML_LINE_STRING = "LineString";

@@ -125,11 +125,11 @@ public abstract class FrenchDataSetHandler extends SimpleDataSetHandler implemen
     }
     
     protected static final LatLon getLatLonByDptCode(EastNorth en, String dpt, boolean useCC9) {
-        if (dpt.equals("971") || dpt.equals("972") || dpt.equals("977") || dpt.equals("978")) {	// Antilles
+        if (dpt.equals("971") || dpt.equals("972") || dpt.equals("977") || dpt.equals("978")) {    // Antilles
             return utm20.eastNorth2latlon(en);
-        } else if (dpt.equals("973")) {	// Guyane
+        } else if (dpt.equals("973")) {    // Guyane
             return utm22.eastNorth2latlon(en);
-        } else if (dpt.equals("974")) {	// La Réunion
+        } else if (dpt.equals("974")) {    // La Réunion
             return utm40.eastNorth2latlon(en);
         } else if (dpt.equals("976") || dpt.equals("985")) { // 985 = ancien code de Mayotte ? (présent dans geofla)
             return utm38.eastNorth2latlon(en);
