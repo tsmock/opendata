@@ -33,7 +33,7 @@ public class EclairagePublicHandler extends ParisDataSetHandler {
     private final class InternalShpHandler extends ParisShpHandler {
         
         @Override
-        public void notifyFeatureParsed(Object feature, DataSet result,	Set<OsmPrimitive> featurePrimitives) {
+        public void notifyFeatureParsed(Object feature, DataSet result,    Set<OsmPrimitive> featurePrimitives) {
             initFeaturesPrimitives(featurePrimitives);
             if (dataPrimitive == null) {
                 System.err.println("Found no primitive with tags");
@@ -64,21 +64,21 @@ public class EclairagePublicHandler extends ParisDataSetHandler {
                 
                 /*if (dataPrimitive.get("Info") == null) {
                     System.err.println("Found no primitive with tag 'Info'");
-                } else if (dataPrimitive.get("Info").equals("LEA")) {		//	LEA;Lanterne électrique axiale;2834;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LEL")) {		//	LEL;Lampadaire électrique;61337;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LEM")) {		//	LEM;Lanterne électrique murale;789;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LEMB")) {		//	LEMB;Lanterne électrique murale bord;14727;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LEMRND")) {	//	LEMRND;Lanterne électrique murale renvoi à droite;5635;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LEMRNG")) {	//	LEMRNG;Lanterne électrique murale renvoi à gauche;3822;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LERRND")) {	//	LERRND;Lanterne électrique murale et boite raccord BT renvoi à droite;5657;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LERRNG")) {	//	LERRNG;Lanterne électrique murale et boite raccord BT renvoi à gauche;3377;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("LSO")) {		//	LSO;Lanterne au sol;1337;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PHO")) {		//	PHO;Poteau horaire;17;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PPEP")) {		//	PPEP;Poteau provisoire d'éclairage public;181;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PPR")) {		//	PPR;poteau à projecteur;67;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PRJ")) {		//	PRJ;Projecteur au sol ou mural;1864;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PRJRND")) {	//	PRJRND;Projecteur au sol ou mural renvoi à droite;42;eclairage_public.zip;Niveau 18
-                } else if (dataPrimitive.get("Info").equals("PRJRNG")) {	//	PRJRNG;Projecteur au sol ou mural renvoi à gauche;57;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEA")) {        //    LEA;Lanterne électrique axiale;2834;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEL")) {        //    LEL;Lampadaire électrique;61337;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEM")) {        //    LEM;Lanterne électrique murale;789;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEMB")) {        //    LEMB;Lanterne électrique murale bord;14727;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEMRND")) {    //    LEMRND;Lanterne électrique murale renvoi à droite;5635;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LEMRNG")) {    //    LEMRNG;Lanterne électrique murale renvoi à gauche;3822;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LERRND")) {    //    LERRND;Lanterne électrique murale et boite raccord BT renvoi à droite;5657;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LERRNG")) {    //    LERRNG;Lanterne électrique murale et boite raccord BT renvoi à gauche;3377;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("LSO")) {        //    LSO;Lanterne au sol;1337;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PHO")) {        //    PHO;Poteau horaire;17;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PPEP")) {        //    PPEP;Poteau provisoire d'éclairage public;181;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PPR")) {        //    PPR;poteau à projecteur;67;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PRJ")) {        //    PRJ;Projecteur au sol ou mural;1864;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PRJRND")) {    //    PRJRND;Projecteur au sol ou mural renvoi à droite;42;eclairage_public.zip;Niveau 18
+                } else if (dataPrimitive.get("Info").equals("PRJRNG")) {    //    PRJRNG;Projecteur au sol ou mural renvoi à gauche;57;eclairage_public.zip;Niveau 18
                 } else {
                     System.err.println("Unsupported Info: "+dataPrimitive.get("Info"));
                 }*/

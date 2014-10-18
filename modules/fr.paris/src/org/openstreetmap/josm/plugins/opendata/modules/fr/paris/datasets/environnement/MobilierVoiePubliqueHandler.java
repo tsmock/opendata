@@ -33,7 +33,7 @@ public class MobilierVoiePubliqueHandler extends ParisDataSetHandler {
     
     private final class InternalShpHandler extends ParisShpHandler {
         @Override
-        public void notifyFeatureParsed(Object feature, DataSet result,	Set<OsmPrimitive> featurePrimitives) {
+        public void notifyFeatureParsed(Object feature, DataSet result,    Set<OsmPrimitive> featurePrimitives) {
             initFeaturesPrimitives(featurePrimitives);
             String type = dataPrimitive.get("Libelle");
             if (type.startsWith("Banc ")) {
