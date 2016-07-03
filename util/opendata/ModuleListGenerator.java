@@ -14,10 +14,14 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ModuleListGenerator {
+public final class ModuleListGenerator {
+
+    private ModuleListGenerator() {
+        // Hide default constructor for utilities classes
+    }
 
     /**
-     * @param args
+     * @param args Main program arguments
      */
     public static void main(String[] args) {
         final String url = "http://svn.openstreetmap.org/applications/editors/josm/plugins/opendata/dist/";
@@ -26,9 +30,9 @@ public class ModuleListGenerator {
             baseDir = args[0];
         }
         try (
-            BufferedWriter list = new BufferedWriter(new FileWriter(baseDir+"modules.txt"));
-            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(baseDir+"modules-icons.zip"));
-        ) {
+                BufferedWriter list = new BufferedWriter(new FileWriter(baseDir+"modules.txt"));
+                ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(baseDir+"modules-icons.zip"));
+                ) {
             for (File file : new File(baseDir+"dist").listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
@@ -50,7 +54,7 @@ public class ModuleListGenerator {
                                 zip.putNextEntry(new ZipEntry(name));
                                 // Directory tree to image
                                 String[] items = value.toString().split("/");
-                                for (int i=0; i<items.length-1; i++) {
+                                for (int i = 0; i < items.length-1; i++) {
                                     zip.putNextEntry(new ZipEntry(name += items[i]+"/"));
                                 }
                                 // Image file
@@ -84,7 +88,7 @@ public class ModuleListGenerator {
                             }
                         }
                     }
-                    
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
