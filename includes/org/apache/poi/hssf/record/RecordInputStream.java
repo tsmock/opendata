@@ -41,10 +41,9 @@ public final class RecordInputStream implements LittleEndianInput {
     private static final byte[] EMPTY_BYTE_ARRAY = { };
 
     /**
-     * For use in {@link BiffViewer} which may construct {@link Record}s that don't completely
+     * For use in {@code BiffViewer} which may construct {@link Record}s that don't completely
      * read all available data.  This exception should never be thrown otherwise.
      */
-    @SuppressWarnings("serial")
     public static final class LeftoverDataException extends RuntimeException {
         public LeftoverDataException(int sid, int remainingByteCount) {
             super("Initialisation of record 0x" + Integer.toHexString(sid).toUpperCase()
@@ -84,12 +83,15 @@ public final class RecordInputStream implements LittleEndianInput {
         public SimpleHeaderInput(InputStream in) {
             _lei = getLEI(in);
         }
+        @Override
         public int available() {
             return _lei.available();
         }
+        @Override
         public int readDataSize() {
             return _lei.readUShort();
         }
+        @Override
         public int readRecordSID() {
             return _lei.readUShort();
         }
@@ -118,6 +120,7 @@ public final class RecordInputStream implements LittleEndianInput {
      * @return the number of bytes available in the current BIFF record
      * @see #remaining()
      */
+    @Override
     public int available() {
         return remaining();
     }
@@ -210,6 +213,7 @@ public final class RecordInputStream implements LittleEndianInput {
     /**
      * Reads an 8 bit, signed value
      */
+    @Override
     public byte readByte() {
         checkRecordPosition(LittleEndian.BYTE_SIZE);
         _currentDataOffset += LittleEndian.BYTE_SIZE;
@@ -219,6 +223,7 @@ public final class RecordInputStream implements LittleEndianInput {
     /**
      * Reads a 16 bit, signed value
      */
+    @Override
     public short readShort() {
         checkRecordPosition(LittleEndian.SHORT_SIZE);
         _currentDataOffset += LittleEndian.SHORT_SIZE;
@@ -226,8 +231,9 @@ public final class RecordInputStream implements LittleEndianInput {
     }
 
     /**
-     * Reads a 32 bit, signed value 
+     * Reads a 32 bit, signed value
      */
+    @Override
     public int readInt() {
         checkRecordPosition(LittleEndian.INT_SIZE);
         _currentDataOffset += LittleEndian.INT_SIZE;
@@ -237,6 +243,7 @@ public final class RecordInputStream implements LittleEndianInput {
     /**
      * Reads a 64 bit, signed value
      */
+    @Override
     public long readLong() {
         checkRecordPosition(LittleEndian.LONG_SIZE);
         _currentDataOffset += LittleEndian.LONG_SIZE;
@@ -246,6 +253,7 @@ public final class RecordInputStream implements LittleEndianInput {
     /**
      * Reads an 8 bit, unsigned value
      */
+    @Override
     public int readUByte() {
         return readByte() & 0x00FF;
     }
@@ -253,12 +261,14 @@ public final class RecordInputStream implements LittleEndianInput {
     /**
      * Reads a 16 bit, unsigned value.
      */
+    @Override
     public int readUShort() {
         checkRecordPosition(LittleEndian.SHORT_SIZE);
         _currentDataOffset += LittleEndian.SHORT_SIZE;
         return _dataInput.readUShort();
     }
 
+    @Override
     public double readDouble() {
         long valueLongBits = readLong();
         double result = Double.longBitsToDouble(valueLongBits);
@@ -267,10 +277,12 @@ public final class RecordInputStream implements LittleEndianInput {
         }
         return result;
     }
+    @Override
     public void readFully(byte[] buf) {
         readFully(buf, 0, buf.length);
     }
 
+    @Override
     public void readFully(byte[] buf, int off, int len) {
         checkRecordPosition(len);
         _dataInput.readFully(buf, off, len);

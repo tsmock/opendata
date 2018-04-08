@@ -33,7 +33,6 @@ import java.util.Set;
  * Title:  Record Factory<P>
  * Description:  Takes a stream and outputs an array of Record objects.<P>
  *
- * @see org.apache.poi.hssf.eventmodel.EventRecordFactory
  * @author Andrew C. Oliver (acoliver at apache dot org)
  * @author Marc Johnson (mjohnson at apache dot org)
  * @author Glen Stampoultzis (glens at apache.org)
@@ -53,6 +52,7 @@ public final class RecordFactory {
         public ReflectionConstructorRecordCreator(Constructor<? extends Record> c) {
             _c = c;
         }
+        @Override
         public Record create(RecordInputStream in) {
             Object[] args = { in, };
             try {
@@ -67,6 +67,7 @@ public final class RecordFactory {
                 throw new RecordFormatException("Unable to construct record instance" , e.getTargetException());
             }
         }
+        @Override
         public Class<? extends Record> getRecordClass() {
             return _c.getDeclaringClass();
         }
@@ -81,6 +82,7 @@ public final class RecordFactory {
         public ReflectionMethodRecordCreator(Method m) {
             _m = m;
         }
+        @Override
         public Record create(RecordInputStream in) {
             Object[] args = { in, };
             try {
@@ -93,6 +95,7 @@ public final class RecordFactory {
                 throw new RecordFormatException("Unable to construct record instance" , e.getTargetException());
             }
         }
+        @Override
         @SuppressWarnings("unchecked")
         public Class<? extends Record> getRecordClass() {
             return (Class<? extends Record>) _m.getDeclaringClass();
